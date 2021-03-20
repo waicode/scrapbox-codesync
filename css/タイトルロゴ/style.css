@@ -1,0 +1,27 @@
+.project-home::before {
+  content: "";
+  display: inline-block;
+  width: 49px;
+  height: 49px;
+  background: url(https://i.gyazo.com/0a495be412d479fca9d9ecf3750b43da.png)
+    no-repeat;
+  background-size: contain;
+}
+.project-home .title {
+  padding-left: 1.2em;
+}
+
+@media screen and (max-width: 768px) {
+  .quick-launch .project-home,
+  .quick-launch .project-home .title {
+    overflow: visible !important;
+  }
+  .project-home::before {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .project-home .title {
+    display: none;
+  }
+}
