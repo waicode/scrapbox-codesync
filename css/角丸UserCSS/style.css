@@ -1,0 +1,28 @@
+.page,
+.grid li.page-list-item a,
+.grid.grid-md li.page-list-item a,
+.grid.grid-lg li.page-list-item a {
+  border-radius: 15px;
+}
+
+.grid li.page-list-item a .header {
+  position: absolute;
+  bottom: 0px;
+  z-index: 1;
+  background: rgba(240, 240, 240, 0.9);
+  border-top: 1px;
+}
+
+.grid li.page-list-item a .icon img {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
+
+.grid li.page-list-item a:hover {
+  border-radius: 10px;
+  box-shadow: 0px 0px 0px 4px #729fcf;
+}
+.container {
+  max-width: none;
+}

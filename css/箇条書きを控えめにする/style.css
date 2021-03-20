@@ -1,0 +1,10 @@
+.app .line .indent-mark .dot {
+  height: 0.2em;
+  width: 0.4em;
+  border-radius: 25%;
+  background-color: rgba(173, 173, 173, 0.85);
+}
+.app:not(.presentation) .line .indent-mark .dot {
+  top: auto;
+  bottom: 0;
+}

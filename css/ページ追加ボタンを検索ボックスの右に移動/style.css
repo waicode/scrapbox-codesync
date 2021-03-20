@@ -1,0 +1,7 @@
+.navbar-form {
+  flex-flow: row-reverse;
+}
+.new-button {
+  margin-left: 10px;
+  margin-right: 0;
+}
