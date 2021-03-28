@@ -20,10 +20,7 @@ function isSignatureValid(body, headers) {
   const hmac = crypto.createHmac(sigHashAlg, process.env.SECRET_TOKEN);
   hmac.update(body, "utf8");
   const digest = `${sigHashAlg}=` + hmac.digest("hex");
-  return (
-    digest.length == sigHeader.length &&
-    crypto.timingSafeEqual(digest, sigHeader)
-  );
+  return digest.length == sigHeader.length && digest == sigHeader;
 }
 
 function okResponse() {
