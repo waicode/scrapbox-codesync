@@ -1,5 +1,7 @@
 "use strict";
 
+const chromium = require("chrome-aws-lambda");
+
 module.exports.hello = async (event) => {
   let result = null;
   let browser = null;
@@ -29,7 +31,17 @@ module.exports.hello = async (event) => {
 
     result = await page.title();
   } catch (error) {
-    return callback(error);
+    console.error(error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify(
+        {
+          message: error,
+        },
+        null,
+        2
+      ),
+    };
   } finally {
     if (browser !== null) {
       await browser.close();
