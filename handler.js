@@ -23,7 +23,7 @@ function isSignatureValid(body, headers) {
   return digest.length == sigHeader.length && digest == sigHeader;
 }
 
-function okResponse() {
+function okResponse(result) {
   return {
     statusCode: 200,
     body: JSON.stringify(
@@ -105,5 +105,5 @@ module.exports.sync = async (event) => {
       await browser.close();
     }
   }
-  return okResponse();
+  return okResponse(result);
 };
