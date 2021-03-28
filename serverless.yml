@@ -1,15 +1,21 @@
 service: scrapbox-codesync
+
 frameworkVersion: "2"
+
 plugins:
   - serverless-dotenv-plugin
   - serverless-cloudformation-changesets
 
+useDotenv: true
+
 custom:
   defaultRegion: ap-northeast-1
-  defaultStage: dev
+  defaultStage: local
   profile: slsfw-${self:provider.stage} # stageに応じたprofile名を指定
+  projectName: ${env.PROJECT_NAME}
   environment:
     SLS_STAGE: ${self:provider.stage}
+    PROJECT_NAME: ${self:custom.projectName}
 
 provider:
   name: aws
@@ -18,14 +24,19 @@ provider:
   profile: ${opt:profile, self:custom.profile}
   region: ${opt:region, self:custom.defaultRegion}
   stage: ${opt:stage, self:custom.defaultStage}
+  apiGateway:
+    shouldStartNameWithService: true
 
 functions:
-  hello:
-    handler: handler.hello
+  sync:
+    handler: handler.sync
+    events:
+      - http:
+          path: scrapbox/code/sync
+          method: post
     layers:
       - { Ref: ChromeLambdaLayer }
     environment: ${self:custom.environment}
-
 package:
   exclude:
     - node_modules/serverless/**
