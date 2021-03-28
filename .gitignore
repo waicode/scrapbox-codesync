@@ -1,0 +1,4 @@
+serverless/chrome-aws-lambda
+serverless/node_modules
+serverless/jspm_packages
+serverless/.serverless
