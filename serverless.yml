@@ -12,15 +12,27 @@ custom:
   defaultRegion: ap-northeast-1
   defaultStage: local
   profile: slsfw-${self:provider.stage} # stageに応じたprofile名を指定
-  projectName: ${env.PROJECT_NAME}
+  projectName: ${opt:projectName, env:PROJECT_NAME}
+  secretToken: ${opt:secretToken, env:SECRET_TOKEN}
   environment:
     SLS_STAGE: ${self:provider.stage}
     PROJECT_NAME: ${self:custom.projectName}
+    SECRET_TOKEN: ${self:custom.secretToken}
+  request:
+    template:
+      application/json:
+        method: $context.httpMethod,
+        body: $input.json('$'),
+        headers:
+          #foreach($param in $input.params().header.keySet())
+          $param: $util.escapeJavaScript($input.params().header.get($param))
+          #if($foreach.hasNext),#end
+          #end
 
 provider:
   name: aws
   runtime: nodejs12.x
-  timeout: 300
+  timeout: 30
   profile: ${opt:profile, self:custom.profile}
   region: ${opt:region, self:custom.defaultRegion}
   stage: ${opt:stage, self:custom.defaultStage}

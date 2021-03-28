@@ -12,7 +12,68 @@ function isSlsLocal() {
   return process.env.IS_LOCAL || process.env.SLS_STAGE == "local";
 }
 
+function isSignatureValid(body, headers) {
+  const sigHashAlg = "sha256";
+  const sigHeaderName = "X-Hub-Signature-256";
+  const sigHeader = headers[sigHeaderName];
+  const crypto = require("crypto");
+  const hmac = crypto.createHmac(sigHashAlg, process.env.SECRET_TOKEN);
+  hmac.update(body, "utf8");
+  const digest = `${sigHashAlg}=` + hmac.digest("hex");
+  return (
+    digest.length == sigHeader.length &&
+    crypto.timingSafeEqual(digest, sigHeader)
+  );
+}
+
+function okResponse() {
+  return {
+    statusCode: 200,
+    body: JSON.stringify(
+      {
+        message: "ok",
+        title: result,
+      },
+      null,
+      2
+    ),
+  };
+}
+
+function unauthorizedResponse() {
+  return {
+    statusCode: 401,
+    body: JSON.stringify(
+      {
+        message: "unauthorized",
+      },
+      null,
+      2
+    ),
+  };
+}
+
+function fatalResponse() {
+  return {
+    statusCode: 500,
+    body: JSON.stringify(
+      {
+        message: "fatal error",
+      },
+      null,
+      2
+    ),
+  };
+}
+
 module.exports.sync = async (event) => {
+  console.info(`event: ${event}`);
+
+  if (!isSignatureValid(event.body, event.headers)) {
+    console.info("unauthorized signature");
+    return unauthorizedResponse();
+  }
+
   let result = null;
   let browser = null;
 
@@ -36,36 +97,16 @@ module.exports.sync = async (event) => {
     // 4. 存在する場合は一度消してから新規作成
 
     let page = await browser.newPage();
-
     await page.goto(`https://scrapbox.io/${process.env.PROJECT_NAME}/`);
 
     result = await page.title();
   } catch (error) {
     console.error(error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify(
-        {
-          message: "system error",
-        },
-        null,
-        2
-      ),
-    };
+    return fatalResponse();
   } finally {
     if (browser !== null) {
       await browser.close();
     }
   }
-
-  return {
-    statusCode: 200,
-    body: JSON.stringify(
-      {
-        title: result,
-      },
-      null,
-      2
-    ),
-  };
+  return okResponse();
 };
