@@ -46,4 +46,4 @@ package:
 layers:
   chrome:
     package:
-      artifact: ./chrome-aws-lambda/chrome_aws_lambda.zip
+      artifact: ./layers/chrome_aws_lambda.zip
