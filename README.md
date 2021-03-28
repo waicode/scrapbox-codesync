@@ -1,1 +1,1 @@
-scrapboxcodesync
+scrapbox-codesync
