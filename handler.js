@@ -11,7 +11,7 @@ module.exports.hello = async (event) => {
       browser = await chromium.puppeteer.launch({
         args: chromium.args,
         defaultViewport: chromium.defaultViewport,
-        executablePath: null, //
+        executablePath: null, // local puppeteer in node_modules(dev)
         headless: chromium.headless,
         ignoreHTTPSErrors: true,
       });
@@ -36,7 +36,7 @@ module.exports.hello = async (event) => {
       statusCode: 500,
       body: JSON.stringify(
         {
-          message: error,
+          message: "system error",
         },
         null,
         2
