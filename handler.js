@@ -6,8 +6,64 @@ const { cookie } = require("request");
 function getSidCookieJson() {
   return [
     {
+      domain: ".scrapbox.io",
+      expirationDate: 1648646416,
+      hostOnly: false,
+      httpOnly: false,
+      name: "__stripe_mid",
+      path: "/",
+      sameSite: "lax",
+      secure: false,
+      session: false,
+      storeId: "0",
+      value: "f9c0dcd1-1fd9-4ff0-8d31-e40e454202e1690466",
+      id: 1,
+    },
+    {
+      domain: ".scrapbox.io",
+      expirationDate: 1617112216,
+      hostOnly: false,
+      httpOnly: false,
+      name: "__stripe_sid",
+      path: "/",
+      sameSite: "lax",
+      secure: false,
+      session: false,
+      storeId: "0",
+      value: "7db5f6f8-7752-4f6b-bfa4-71d438179cf84f2407",
+      id: 2,
+    },
+    {
+      domain: ".scrapbox.io",
+      expirationDate: 1636284654,
+      hostOnly: false,
+      httpOnly: false,
+      name: "__zlcmid",
+      path: "/",
+      sameSite: "lax",
+      secure: false,
+      session: false,
+      storeId: "0",
+      value: "113jZFUz5TVt8kY",
+      id: 3,
+    },
+    {
+      domain: ".scrapbox.io",
+      expirationDate: 1679987328,
+      hostOnly: false,
+      httpOnly: false,
+      name: "_ga",
+      path: "/",
+      sameSite: "unspecified",
+      secure: false,
+      session: false,
+      storeId: "0",
+      value: "GA1.2.17086681.1565273906",
+      id: 4,
+    },
+    {
       domain: "scrapbox.io",
-      expirationDate: 1622293546.119442,
+      expirationDate: 1622294419.047579,
       hostOnly: true,
       httpOnly: true,
       name: "connect.sid",
@@ -122,9 +178,13 @@ module.exports.sync = async (event) => {
     // 4. 存在する場合は一度消してから新規作成
 
     await page.goto(
-      `https://scrapbox.io/${process.env.PROJECT_NAME}/test?body=aiueo`
+      `https://scrapbox.io/${process.env.PROJECT_NAME}/aiueo?body=aiueo`
     );
 
+    await page.waitForNavigation({
+      timeout: 60000,
+      waitUntil: "domcontentloaded",
+    });
     result = await page.title();
   } catch (error) {
     console.error(error);
