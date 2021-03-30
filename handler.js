@@ -105,6 +105,8 @@ module.exports.sync = async (event) => {
       ignoreHTTPSErrors: true,
     });
 
+    let page = await browser.newPage();
+
     // scrapbox.ioのクッキーにconnect.sidを設定
     const sidCookie = getSidCookieJson();
     await page.setCookie(...sidCookie);
@@ -119,7 +121,6 @@ module.exports.sync = async (event) => {
 
     // 4. 存在する場合は一度消してから新規作成
 
-    let page = await browser.newPage();
     await page.goto(
       `https://scrapbox.io/${process.env.PROJECT_NAME}/test?body=aiueo`
     );
