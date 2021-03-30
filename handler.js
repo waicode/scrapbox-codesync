@@ -1,6 +1,26 @@
 "use strict";
 
 const chromium = require("chrome-aws-lambda");
+const { cookie } = require("request");
+
+function getSidCookieJson() {
+  return [
+    {
+      domain: "scrapbox.io",
+      expirationDate: 1622293546.119442,
+      hostOnly: true,
+      httpOnly: true,
+      name: "connect.sid",
+      path: "/",
+      sameSite: "unspecified",
+      secure: true,
+      session: false,
+      storeId: "0",
+      value: process.env.SCRAPBOX_CONNECT_SID,
+      id: 5,
+    },
+  ];
+}
 
 function isSlsLocal() {
   if (process.env.IS_LOCAL) {
@@ -66,9 +86,11 @@ function fatalResponse() {
 module.exports.sync = async (event) => {
   console.info(`event: ${event}`);
 
-  if (!isSignatureValid(event.body, event.headers)) {
-    console.info("unauthorized signature");
-    return unauthorizedResponse();
+  if (!isSlsLocal) {
+    if (!isSignatureValid(event.body, event.headers)) {
+      console.info("unauthorized signature");
+      return unauthorizedResponse();
+    }
   }
 
   let result = null;
@@ -83,6 +105,10 @@ module.exports.sync = async (event) => {
       ignoreHTTPSErrors: true,
     });
 
+    // scrapbox.ioのクッキーにconnect.sidを設定
+    const sidCookie = getSidCookieJson();
+    await page.setCookie(...sidCookie);
+
     // 1. 変更があったcssまたはjsをイベントから取得
 
     // 以下、複数件のループ処理
@@ -94,7 +120,9 @@ module.exports.sync = async (event) => {
     // 4. 存在する場合は一度消してから新規作成
 
     let page = await browser.newPage();
-    await page.goto(`https://scrapbox.io/${process.env.PROJECT_NAME}/`);
+    await page.goto(
+      `https://scrapbox.io/${process.env.PROJECT_NAME}/test?body=aiueo`
+    );
 
     result = await page.title();
   } catch (error) {

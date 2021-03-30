@@ -14,10 +14,12 @@ custom:
   profile: slsfw-${self:provider.stage} # stageに応じたprofile名を指定
   projectName: ${opt:projectName, env:PROJECT_NAME}
   secretToken: ${opt:secretToken, env:SECRET_TOKEN}
+  scrapboxConnectSid: ${opt:scrapboxConnectSid, env:SCRAPBOX_CONNECT_SID}
   environment:
     SLS_STAGE: ${self:provider.stage}
     PROJECT_NAME: ${self:custom.projectName}
     SECRET_TOKEN: ${self:custom.secretToken}
+    SCRAPBOX_CONNECT_SID: ${self:custom.scrapboxConnectSid}
   request:
     template:
       application/json:
