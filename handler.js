@@ -181,10 +181,7 @@ module.exports.sync = async (event) => {
       `https://scrapbox.io/${process.env.PROJECT_NAME}/aiueo?body=aiueo`
     );
 
-    await page.waitForNavigation({
-      timeout: 60000,
-      waitUntil: "domcontentloaded",
-    });
+    await page.waitForSelector("#editor");
     result = await page.title();
   } catch (error) {
     console.error(error);
