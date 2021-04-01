@@ -181,8 +181,27 @@ module.exports.sync = async (event) => {
       `https://scrapbox.io/${process.env.PROJECT_NAME}/aiueo?body=aiueo`
     );
 
-    await page.waitForSelector("#editor");
-    result = await page.title();
+    const pageEditMenuSelector = "#page-edit-menu";
+    await page.waitForSelector(pageEditMenuSelector);
+    await page.click(pageEditMenuSelector);
+
+    const deleteMenuBtnSelector =
+      '#app-container div.dropdown.open ul > li > a[title="Delete"]';
+    await page.waitForSelector(deleteMenuBtnSelector);
+    await page.click(deleteMenuBtnSelector);
+
+    await page.waitForTimeout(3000);
+
+    page.on("dialog", async (dialog) => {
+      console.log(dialog.message());
+      await dialog.accept();
+    });
+
+    await page.goto(
+      `https://scrapbox.io/${process.env.PROJECT_NAME}/aiueo?body=aiueo`
+    );
+    await page.waitForSelector(pageEditMenuSelector);
+    await page.click(pageEditMenuSelector);
   } catch (error) {
     console.error(error);
     return fatalResponse();
