@@ -157,7 +157,8 @@ module.exports.sync = async (event) => {
       args: chromium.args,
       defaultViewport: chromium.defaultViewport,
       executablePath: isSlsLocal() ? null : await chromium.executablePath, // local puppeteer in node_modules(dev)
-      headless: chromium.headless,
+      headless: false,
+      slowMo: 300,
       ignoreHTTPSErrors: true,
     });
 
@@ -190,11 +191,13 @@ module.exports.sync = async (event) => {
     await page.waitForSelector(deleteMenuBtnSelector);
     await page.click(deleteMenuBtnSelector);
 
-    await page.waitForTimeout(3000);
+    await page.waitForTimeout(12000);
 
-    page.on("dialog", async (dialog) => {
+    page.once("dialog", (dialog) => {
+      console.log(dialog.type());
       console.log(dialog.message());
-      await dialog.accept();
+      console.log(dialog.defaultValue());
+      dialog.accept();
     });
 
     await page.goto(
