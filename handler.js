@@ -3,67 +3,26 @@
 const chromium = require("chrome-aws-lambda");
 const { cookie } = require("request");
 
+const fs = require("fs");
+
+// 指定したフォルダ配下のファイルパス一覧を取得
+const listFiles = (dir) =>
+  fs
+    .readdirSync(dir, { withFileTypes: true })
+    .flatMap((dirent) =>
+      dirent.isFile()
+        ? [`${dir}/${dirent.name}`]
+        : listFiles(`${dir}/${dirent.name}`)
+    );
+
+// 行頭にタブを入れる（文頭と\nの次に\tを入れ、文末に\tがあれば除去）
+const addTabHeadOfLine = (fileData) =>
+  fileData.replace(/^/g, /\t/g).replace(/\n/g, /\n\t/g).replace(/\t$/g, /\t$/g);
+
 function getSidCookieJson() {
   return [
     {
-      domain: ".scrapbox.io",
-      expirationDate: 1648646416,
-      hostOnly: false,
-      httpOnly: false,
-      name: "__stripe_mid",
-      path: "/",
-      sameSite: "lax",
-      secure: false,
-      session: false,
-      storeId: "0",
-      value: "f9c0dcd1-1fd9-4ff0-8d31-e40e454202e1690466",
-      id: 1,
-    },
-    {
-      domain: ".scrapbox.io",
-      expirationDate: 1617112216,
-      hostOnly: false,
-      httpOnly: false,
-      name: "__stripe_sid",
-      path: "/",
-      sameSite: "lax",
-      secure: false,
-      session: false,
-      storeId: "0",
-      value: "7db5f6f8-7752-4f6b-bfa4-71d438179cf84f2407",
-      id: 2,
-    },
-    {
-      domain: ".scrapbox.io",
-      expirationDate: 1636284654,
-      hostOnly: false,
-      httpOnly: false,
-      name: "__zlcmid",
-      path: "/",
-      sameSite: "lax",
-      secure: false,
-      session: false,
-      storeId: "0",
-      value: "113jZFUz5TVt8kY",
-      id: 3,
-    },
-    {
-      domain: ".scrapbox.io",
-      expirationDate: 1679987328,
-      hostOnly: false,
-      httpOnly: false,
-      name: "_ga",
-      path: "/",
-      sameSite: "unspecified",
-      secure: false,
-      session: false,
-      storeId: "0",
-      value: "GA1.2.17086681.1565273906",
-      id: 4,
-    },
-    {
       domain: "scrapbox.io",
-      expirationDate: 1622294419.047579,
       hostOnly: true,
       httpOnly: true,
       name: "connect.sid",
@@ -73,7 +32,7 @@ function getSidCookieJson() {
       session: false,
       storeId: "0",
       value: process.env.SCRAPBOX_CONNECT_SID,
-      id: 5,
+      id: 1,
     },
   ];
 }
@@ -140,7 +99,9 @@ function fatalResponse() {
 }
 
 module.exports.sync = async (event) => {
-  console.info(`event: ${event}`);
+  if (!isSlsLocal) {
+    console.info(`event: ${event}`);
+  }
 
   if (!isSlsLocal) {
     if (!isSignatureValid(event.body, event.headers)) {
@@ -152,12 +113,14 @@ module.exports.sync = async (event) => {
   let result = null;
   let browser = null;
 
+  console.info(`chromium.headless: ${chromium.headless}`);
+
   try {
     browser = await chromium.puppeteer.launch({
       args: chromium.args,
       defaultViewport: chromium.defaultViewport,
       executablePath: isSlsLocal() ? null : await chromium.executablePath, // local puppeteer in node_modules(dev)
-      headless: false,
+      headless: chromium.headless,
       slowMo: 300,
       ignoreHTTPSErrors: true,
     });
@@ -170,7 +133,46 @@ module.exports.sync = async (event) => {
 
     // 1. 変更があったcssまたはjsをイベントから取得
 
+    // 1. codeフォルダ配下のstyleとscriptのパスを取得
+    const cssFilesList = listFiles("code/css");
+
+    // UserCSSページタイトルをフォルダ名から取得
+    const userCssPageDicList = await Promise.all(
+      cssFilesList.map(async (path) => {
+        let fileData = await fs.readFileSync(path, "utf-8");
+        return {
+          title: path.match(new RegExp("code/css/(.+)/.+.css"))[1],
+          code: addTabHeadOfLine(fileData),
+        };
+      })
+    );
+
+    console.log(userCssPageDicList);
+
+    // UserScriptページタイトルをフォルダ名から取得
+    const jsFilesList = listFiles("code/js");
+    const userScriptPageDicList = await Promise.all(
+      jsFilesList.map(async (path) => {
+        const jsReg = new RegExp("code/js/(.+)/.+.js");
+        let fileData = await fs.readFileSync(path, "utf-8");
+        // 行頭にタブを入れる（最初と\nの次、ただし最後の\nの次は不要）
+        fileData = fileData
+          .replace(/^/g, "\t")
+          .replace(/\n/g, "\n\t")
+          .replace(/\t$/g, "");
+        console.log(fileData);
+        return { title: path.match(jsReg)[1], code: fileData };
+      })
+    );
+    console.log(userScriptPageDicList);
+
     // 以下、複数件のループ処理
+    const cssTagName = "#UserCSS";
+    for (let userCssPageDic of userCssPageDicList) {
+      let cssPage = `${cssTagName} + \n\n + "code:style.css" + \n + ${userCssPageDic.code} + \n\n`;
+    }
+
+    const scriptTagName = "#UserScript";
 
     // 2. 対象ページの存在を確認する
 
@@ -185,26 +187,20 @@ module.exports.sync = async (event) => {
     const pageEditMenuSelector = "#page-edit-menu";
     await page.waitForSelector(pageEditMenuSelector);
     await page.click(pageEditMenuSelector);
+    console.info(`Page edit menu is Clicked.`);
 
     const deleteMenuBtnSelector =
       '#app-container div.dropdown.open ul > li > a[title="Delete"]';
+
+    page.on("dialog", async (dialog) => {
+      await dialog.accept();
+      console.info(`Delete dialog: OK is Clicked.`);
+    });
+
     await page.waitForSelector(deleteMenuBtnSelector);
     await page.click(deleteMenuBtnSelector);
 
-    await page.waitForTimeout(12000);
-
-    page.once("dialog", (dialog) => {
-      console.log(dialog.type());
-      console.log(dialog.message());
-      console.log(dialog.defaultValue());
-      dialog.accept();
-    });
-
-    await page.goto(
-      `https://scrapbox.io/${process.env.PROJECT_NAME}/aiueo?body=aiueo`
-    );
-    await page.waitForSelector(pageEditMenuSelector);
-    await page.click(pageEditMenuSelector);
+    await page.waitForTimeout(3000);
   } catch (error) {
     console.error(error);
     return fatalResponse();
