@@ -12,14 +12,14 @@ custom:
   defaultRegion: ap-northeast-1
   defaultStage: local
   profile: slsfw-${self:provider.stage} # stageに応じたprofile名を指定
-  projectName: ${opt:projectName, env:PROJECT_NAME}
-  secretToken: ${opt:secretToken, env:SECRET_TOKEN}
-  scrapboxConnectSid: ${opt:scrapboxConnectSid, env:SCRAPBOX_CONNECT_SID}
   environment:
     SLS_STAGE: ${self:provider.stage}
-    PROJECT_NAME: ${self:custom.projectName}
-    SECRET_TOKEN: ${self:custom.secretToken}
-    SCRAPBOX_CONNECT_SID: ${self:custom.scrapboxConnectSid}
+    PROJECT_NAME: ${opt:projectName, env:PROJECT_NAME}
+    SECRET_TOKEN: ${opt:secretToken, env:SECRET_TOKEN}
+    SCRAPBOX_CONNECT_SID: ${opt:scrapboxConnectSid, env:SCRAPBOX_CONNECT_SID}
+    USER_CSS_EYECATCH_URL: ${env:USER_CSS_EYECATCH_URL}
+    USER_SCRIPT_EYECATCH_URL: ${env:USER_SCRIPT_EYECATCH_URL}
+
   request:
     template:
       application/json:
@@ -34,7 +34,7 @@ custom:
 provider:
   name: aws
   runtime: nodejs12.x
-  timeout: 30
+  timeout: 900
   profile: ${opt:profile, self:custom.profile}
   region: ${opt:region, self:custom.defaultRegion}
   stage: ${opt:stage, self:custom.defaultStage}
