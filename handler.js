@@ -144,18 +144,21 @@ async function addPage(page, targetUrl, editMenuSelector) {
   ]);
 }
 
-module.exports.sync = async (event) => {
+module.exports.receive = async (event) => {
+  let result = null;
   if (!isSlsLocal) {
-    console.info(`event: ${event}`);
+    console.info(event);
   }
-
   if (!isSlsLocal) {
     if (!isSignatureValid(event.body, event.headers)) {
       console.info("unauthorized signature");
       return unauthorizedResponse();
     }
   }
+  return okResponse(result);
+};
 
+module.exports.sync = async () => {
   let result = null;
   let browser = null;
 

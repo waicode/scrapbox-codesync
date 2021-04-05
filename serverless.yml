@@ -44,13 +44,19 @@ provider:
 functions:
   sync:
     handler: handler.sync
+    layers:
+      - { Ref: ChromeLambdaLayer }
+    environment: ${self:custom.environment}
+  receive:
+    handler: handler.receive
     events:
       - http:
-          path: scrapbox/code/sync
+          path: scrapbox/code/receive
           method: post
     layers:
       - { Ref: ChromeLambdaLayer }
     environment: ${self:custom.environment}
+
 package:
   exclude:
     - node_modules/serverless/**
