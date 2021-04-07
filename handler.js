@@ -148,6 +148,7 @@ module.exports.receive = async (event) => {
   let result = null;
   if (!isSlsLocal) {
     console.info(event);
+    console.info(event.action);
   }
   if (!isSlsLocal) {
     if (!isSignatureValid(event.body, event.headers)) {
