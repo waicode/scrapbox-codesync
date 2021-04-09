@@ -145,18 +145,26 @@ async function addPage(page, targetUrl, editMenuSelector) {
 }
 
 module.exports.receive = async (event) => {
+  if (isSlsLocal) {
+    console.error("no event on local");
+    return fatalResponse();
+  }
+
   let result = null;
-  if (!isSlsLocal) {
-    console.info(event);
-    console.info(event.action);
-    console.info(event.commits);
+  if (!isSignatureValid(event.body, event.headers)) {
+    console.info("unauthorized signature");
+    return unauthorizedResponse();
   }
-  if (!isSlsLocal) {
-    if (!isSignatureValid(event.body, event.headers)) {
-      console.info("unauthorized signature");
-      return unauthorizedResponse();
-    }
-  }
+
+  console.info(event);
+  console.info(event.action);
+  console.info(event.commits.added);
+  console.info(event.commits.modified);
+  console.info(event.commits.removed);
+
+  const addList = event.commits.added.concat(event.commits.modified);
+  const removeList = event.commits.removed;
+
   return okResponse(result);
 };
 
