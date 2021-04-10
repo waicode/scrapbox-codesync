@@ -42,8 +42,8 @@ provider:
     shouldStartNameWithService: true
 
 functions:
-  sync:
-    handler: app/handler.sync
+  allSync:
+    handler: app/handler.allSync
     layers:
       - { Ref: ChromeLambdaLayer }
     environment: ${self:custom.environment}
