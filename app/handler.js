@@ -137,34 +137,37 @@ module.exports.receive = async (event) => {
 
   const cssCodeReg = /code\/css\/(.+)\/.+\.css/;
   const jsCodeReg = /code\/js\/(.+)\/.+\.js/;
-  let syncList = Array.from(
-    new Set(
-      pathList.filter((path) => cssCodeReg.test(path) || jsCodeReg.test(path))
-    )
-  ).map(async (path) => {
-    let fileData = await fs.readFileSync(path, "utf-8");
-    if (cssCodeReg.test(path)) {
-      return {
-        type: "css",
-        title: path.match(cssCodeReg)[1],
-        code: addTabHeadOfLine(fileData),
-      };
-    } else if (jsCodeReg.test(path)) {
-      return {
-        type: "js",
-        title: path.match(jsCodeReg)[1],
-        code: addTabHeadOfLine(fileData),
-      };
-    }
-  });
+  let syncList = await Promise.all(
+    Array.from(
+      new Set(
+        pathList.filter((path) => cssCodeReg.test(path) || jsCodeReg.test(path))
+      )
+    ).map(async (path) => {
+      let fileData = await fs.readFileSync(path, "utf-8");
+      if (cssCodeReg.test(path)) {
+        return {
+          type: "css",
+          title: path.match(cssCodeReg)[1],
+          code: addTabHeadOfLine(fileData),
+        };
+      } else if (jsCodeReg.test(path)) {
+        return {
+          type: "js",
+          title: path.match(jsCodeReg)[1],
+          code: addTabHeadOfLine(fileData),
+        };
+      }
+    })
+  );
 
   if (syncList.length > 0) {
     let browser = await launchBrowser();
     let page = await browser.newPage();
-    for (let sync of syncList) {
-      console.log("sync", sync);
-      // await putCode(page, sync.type, sync.title, sync.code);
-    }
+    Promise.all(
+      syncList.map(async (sync) => {
+        // await putCode(page, sync.type, sync.title, sync.code);
+      })
+    );
   }
 
   return responseFormat.okResponse(result);
