@@ -34,7 +34,7 @@ custom:
 provider:
   name: aws
   runtime: nodejs12.x
-  timeout: 900
+  timeout: 30
   profile: ${opt:profile, self:custom.profile}
   region: ${opt:region, self:custom.defaultRegion}
   stage: ${opt:stage, self:custom.defaultStage}

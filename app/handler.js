@@ -81,6 +81,9 @@ const putCode = async (page, type, title, code) => {
   let pageUrl =
     `https://scrapbox.io/${process.env.PROJECT_NAME}/` +
     encodeURIComponent(title);
+
+  console.log("pageUrl", pageUrl);
+
   await pageAction.deletePage(
     page,
     pageUrl,
@@ -94,6 +97,7 @@ const putCode = async (page, type, title, code) => {
     const cssPageEyeCatch = `[${process.env.USER_CSS_EYECATCH_URL}]`;
     const cssPageData = `\n${cssTagName}\n\n${cssPageEyeCatch}\n\ncode:style.css\n${code}\n\n`;
     pageUrl = `${pageUrl}?body=` + encodeURIComponent(cssPageData);
+    console.log("pageUrl", pageUrl);
     return await pageAction.addPage(page, pageUrl, editMenuSelector);
   } else if (type === "js") {
     const scriptTagName = "#UserScript";
@@ -107,28 +111,25 @@ const putCode = async (page, type, title, code) => {
 };
 
 module.exports.receive = async (event) => {
+  // check stage
   if (isSlsLocal()) {
     console.error("no event on local");
     return responseFormat.fatalResponse("no event on local");
   }
 
-  let result = null;
+  // check signature
   if (!isSignatureValid(event.body, event.headers)) {
     console.info("unauthorized signature");
     return responseFormat.unauthorizedResponse("unauthorized signature");
   }
 
+  // check gitHub event type
   const gitHubEventList = event.headers["X-GitHub-Event"];
   if (!gitHubEventList.includes("push")) {
     return responseFormat.badRequestResponse("only push event");
   }
 
-  console.info(event);
-
   const body = JSON.parse(event.body);
-  console.log("event.body", body);
-
-  console.info(body.commits);
 
   let pathList = [];
   for (let commitInfo of body.commits) {
@@ -169,13 +170,14 @@ module.exports.receive = async (event) => {
         await putCode(page, sync.type, sync.title, sync.code);
       })
     );
+    return responseFormat.okResponse(
+      `sync complete - ${syncList
+        .map((sync) => sync.type + ":" + sync.title)
+        .join(", ")}`
+    );
+  } else {
+    return responseFormat.okResponse("not applicable");
   }
-
-  return responseFormat.okResponse(
-    `sync complete - ${syncList
-      .map((sync) => sync.type + ":" + sync.title)
-      .join(", ")}`
-  );
 };
 
 module.exports.sync = async () => {
