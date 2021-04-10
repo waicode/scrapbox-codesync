@@ -1,5 +1,8 @@
 "use strict";
 
+const pageAction = require("./pageAction");
+const responseFormat = require("./responseFormat");
+
 const chromium = require("chrome-aws-lambda");
 const { cookie } = require("request");
 
@@ -39,7 +42,6 @@ const getSidCookieJson = () => {
 };
 
 const isSlsLocal = () => {
-  console.log(process.env.IS_LOCAL);
   if (process.env.IS_LOCAL) {
     // invoke-local: IS_LOCAL=true
     // https://www.serverless.com/framework/docs/providers/aws/cli-reference/invoke-local/
@@ -70,106 +72,40 @@ const launchBrowser = async () => {
   });
 };
 
-const okResponse = (result) => {
-  return {
-    statusCode: 200,
-    body: JSON.stringify(
-      {
-        message: "ok",
-        title: result,
-      },
-      null,
-      2
-    ),
-  };
-};
-
-const unauthorizedResponse = () => {
-  return {
-    statusCode: 401,
-    body: JSON.stringify(
-      {
-        message: "unauthorized",
-      },
-      null,
-      2
-    ),
-  };
-};
-
-const fatalResponse = () => {
-  return {
-    statusCode: 500,
-    body: JSON.stringify(
-      {
-        message: "fatal error",
-      },
-      null,
-      2
-    ),
-  };
-};
-
-async function deletePage(
-  page,
-  targetUrl,
-  editMenuSelector,
-  deleteBtnSelector
-) {
-  await Promise.all([
-    page.waitForSelector(editMenuSelector),
-    page.goto(targetUrl),
-  ]);
-
-  await Promise.all([
-    page.waitForSelector(deleteBtnSelector),
-    page.click(editMenuSelector),
-  ]);
-
-  const deleteBtn = await page.$(deleteBtnSelector);
-  if (deleteBtn) {
-    return await Promise.all([
-      page.waitForNavigation(),
-      page.click(deleteBtnSelector),
-    ]);
-  } else {
-    return Promise.resolve();
-  }
-}
-
-async function addPage(page, targetUrl, editMenuSelector) {
-  return await Promise.all([
-    page.waitForSelector(editMenuSelector),
-    page.goto(targetUrl),
-  ]);
-}
-
 module.exports.receive = async (event) => {
   if (isSlsLocal()) {
     console.error("no event on local");
-    return fatalResponse();
+    return responseFormat.fatalResponse("no event on local");
   }
 
   let result = null;
   if (!isSignatureValid(event.body, event.headers)) {
     console.info("unauthorized signature");
-    return unauthorizedResponse();
+    return responseFormat.unauthorizedResponse("unauthorized signature");
+  }
+
+  const gitHubEventList = event.headers["X-GitHub-Event"];
+  if (!gitHubEventList.includes("push")) {
+    return responseFormat.badRequestResponse("only push event");
   }
 
   console.info(event);
-  console.info(event.action);
-  console.info(event.commits.added);
-  console.info(event.commits.modified);
-  console.info(event.commits.removed);
 
-  const addList = event.commits.added.concat(event.commits.modified);
+  const body = event.body;
+  console.log("event.body", body);
+
+  console.info(event.body);
+  console.info(body.commits);
+
+  const addList = [];
+
+  event.commits.added.concat(event.commits.modified);
   const removeList = event.commits.removed;
 
-  return okResponse(result);
+  return responseFormat.okResponse(result);
 };
 
 module.exports.sync = async () => {
-  let result = null;
   let browser = null;
 
   try {
@@ -208,7 +144,6 @@ module.exports.sync = async () => {
         };
       })
     );
-    console.log(userScriptPageDicList);
 
     const editMenuSelector = "#page-edit-menu";
     const deleteBtnSelector =
@@ -225,12 +160,17 @@ module.exports.sync = async () => {
       let cssPageUrl =
         `https://scrapbox.io/${process.env.PROJECT_NAME}/` +
         encodeURIComponent(userCssPageDic.title);
-      await deletePage(page, cssPageUrl, editMenuSelector, deleteBtnSelector);
+      await pageAction.deletePage(
+        page,
+        cssPageUrl,
+        editMenuSelector,
+        deleteBtnSelector
+      );
       // ページ作成
       const cssPageEyeCatch = `[${process.env.USER_CSS_EYECATCH_URL}]`;
       const cssPageData = `\n${cssTagName}\n\n${cssPageEyeCatch}\n\ncode:style.css\n${userCssPageDic.code}\n\n`;
       cssPageUrl = `${cssPageUrl}?body=` + encodeURIComponent(cssPageData);
-      await addPage(page, cssPageUrl, editMenuSelector);
+      await pageAction.addPage(page, cssPageUrl, editMenuSelector);
     }
     // UserScript
     const scriptTagName = "#UserScript";
@@ -239,7 +179,7 @@ module.exports.sync = async () => {
       let scriptPageUrl =
         `https://scrapbox.io/${process.env.PROJECT_NAME}/` +
         encodeURIComponent(userScriptPageDic.title);
-      await deletePage(
+      await pageAction.deletePage(
         page,
         scriptPageUrl,
         editMenuSelector,
@@ -250,15 +190,15 @@ module.exports.sync = async () => {
       const scriptPageData = `\n${scriptTagName}\n\n${scriptPageEyeCatch}\n\ncode:script.js\n${userScriptPageDic.code}\n\n`;
       scriptPageUrl =
         `${scriptPageUrl}?body=` + encodeURIComponent(scriptPageData);
-      await addPage(page, scriptPageUrl, editMenuSelector);
+      await pageAction.addPage(page, scriptPageUrl, editMenuSelector);
     }
   } catch (error) {
     console.error(error);
-    return fatalResponse();
+    return responseFormat.fatalResponse();
   } finally {
     if (browser !== null) {
       await browser.close();
     }
   }
-  return okResponse(result);
+  return responseFormat.okResponse();
 };
