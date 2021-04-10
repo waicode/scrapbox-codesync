@@ -107,7 +107,7 @@ module.exports.receive = async (event) => {
     console.info("path", path);
     console.info("cssCodeReg.test(path)", cssCodeReg.test(path));
     console.info("jsCodeReg.test(path)", jsCodeReg.test(path));
-    cssCodeReg.test(path) || jsCodeReg.test(path);
+    return cssCodeReg.test(path) || jsCodeReg.test(path);
   });
   console.info("syncList2", syncList);
   syncList = Array.from(new Set(syncList));
