@@ -142,7 +142,7 @@ module.exports.receive = async (event) => {
       pathList.filter((path) => cssCodeReg.test(path) || jsCodeReg.test(path))
     )
   ).map(async (path) => {
-    let fileData = await fs.readFileSync(`../${path}`, "utf-8");
+    let fileData = await fs.readFileSync(path, "utf-8");
     if (cssCodeReg.test(path)) {
       return {
         type: "css",
