@@ -161,7 +161,7 @@ module.exports.receive = async (event) => {
   if (syncList.length > 0) {
     let browser = await launchBrowser();
     let page = await browser.newPage();
-    for (sync of syncList) {
+    for (let sync of syncList) {
       console.log("sync", sync);
       // await putCode(page, sync.type, sync.title, sync.code);
     }
