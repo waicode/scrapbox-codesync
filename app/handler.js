@@ -91,16 +91,22 @@ module.exports.receive = async (event) => {
 
   console.info(event);
 
-  const body = event.body;
+  const body = JSON.parse(event.body);
   console.log("event.body", body);
 
-  console.info(event.body);
   console.info(body.commits);
 
-  const addList = [];
+  let syncList = [];
+  for (let commitInfo of body.commits) {
+    syncList = syncList.concat(commitInfo.added.concat(commitInfo.modified));
+  }
+  syncList = syncList.filter((path) => {
+    path.match(new RegExp("code/css/(.+)/.+.css"))[1] ||
+      path.match(new RegExp("code/js/(.+)/.+.js"))[1];
+  });
+  syncList = Array.from(new Set(syncList));
 
-  event.commits.added.concat(event.commits.modified);
-  const removeList = event.commits.removed;
+  console.info(syncList);
 
   return responseFormat.okResponse(result);
 };
