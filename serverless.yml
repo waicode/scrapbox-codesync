@@ -43,12 +43,12 @@ provider:
 
 functions:
   sync:
-    handler: handler.sync
+    handler: app/handler.sync
     layers:
       - { Ref: ChromeLambdaLayer }
     environment: ${self:custom.environment}
   receive:
-    handler: handler.receive
+    handler: app/handler.receive
     events:
       - http:
           path: scrapbox/code/receive
