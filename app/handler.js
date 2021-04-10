@@ -100,10 +100,13 @@ module.exports.receive = async (event) => {
   for (let commitInfo of body.commits) {
     syncList = syncList.concat(commitInfo.added.concat(commitInfo.modified));
   }
+  // console.info(syncList);
+  const cssCodeReg = /code\/css\/(.+)\/(.+)\.css/;
+  const jsCodeReg = /code\/js\/(.+)\/(.+)\.js/;
   syncList = syncList.filter((path) => {
-    path.match(new RegExp("code/css/(.+)/.+.css"))[1] ||
-      path.match(new RegExp("code/js/(.+)/.+.js"))[1];
+    cssCodeReg.test(path) || jsCodeReg.test(path);
   });
+  // console.info(syncList);
   syncList = Array.from(new Set(syncList));
 
   console.info(syncList);
@@ -133,7 +136,7 @@ module.exports.sync = async () => {
       cssFilesList.map(async (path) => {
         let cssFileData = await fs.readFileSync(path, "utf-8");
         return {
-          title: path.match(new RegExp("code/css/(.+)/.+.css"))[1],
+          title: path.match(/code\/css\/(.+)\/(.+)\.css/)[1],
           code: addTabHeadOfLine(cssFileData),
         };
       })
@@ -145,7 +148,7 @@ module.exports.sync = async () => {
       jsFilesList.map(async (path) => {
         let jsFileData = await fs.readFileSync(path, "utf-8");
         return {
-          title: path.match(new RegExp("code/js/(.+)/.+.js"))[1],
+          title: path.match(/code\/js\/(.+)\/(.+)\.js/)[1],
           code: addTabHeadOfLine(jsFileData),
         };
       })
