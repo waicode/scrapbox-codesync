@@ -39,6 +39,7 @@ const getSidCookieJson = () => {
 };
 
 const isSlsLocal = () => {
+  console.log(process.env.IS_LOCAL);
   if (process.env.IS_LOCAL) {
     // invoke-local: IS_LOCAL=true
     // https://www.serverless.com/framework/docs/providers/aws/cli-reference/invoke-local/
