@@ -1,12 +1,12 @@
 "use strict";
 
-const constantValue = require("./constantValue");
-const pageAction = require("./pageAction");
-const responseFormat = require("./responseFormat");
+const constantValue = require("./sub/constantValue");
+const pageAction = require("./sub/pageAction");
+const responseFormat = require("./sub/responseFormat");
 
 const fs = require("fs");
 
-// 指定したフォルダ配下のファイルパス一覧を取得
+// Get the list of file paths under the folder
 const listFiles = (dir) =>
   fs
     .readdirSync(dir, { withFileTypes: true })
@@ -16,13 +16,13 @@ const listFiles = (dir) =>
         : listFiles(`${dir}/${dirent.name}`)
     );
 
-// 行頭にタブを入れる（文頭と\nの次に\tを入れ、文末に\tがあれば除去）
+// Put a tab at the beginning of a line（^ => \t, \n => \n\t, delete last \t）
 const addTabHeadOfLine = (fileData) =>
   fileData.replace(/^/g, "\t").replace(/\n/g, "\n\t").replace(/\t$/g, "");
 
 const isSlsLocal = () => {
   if (process.env.IS_LOCAL) {
-    // invoke-local: IS_LOCAL=true
+    // invoke-local -> IS_LOCAL=true
     // https://www.serverless.com/framework/docs/providers/aws/cli-reference/invoke-local/
     console.info("Running on local");
   }
