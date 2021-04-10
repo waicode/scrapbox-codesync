@@ -165,6 +165,7 @@ module.exports.receive = async (event) => {
     let page = await browser.newPage();
     Promise.all(
       syncList.map(async (sync) => {
+        console.log("sync", sync);
         // await putCode(page, sync.type, sync.title, sync.code);
       })
     );
