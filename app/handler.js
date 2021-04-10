@@ -166,12 +166,12 @@ module.exports.receive = async (event) => {
     Promise.all(
       syncList.map(async (sync) => {
         console.log("sync", sync);
-        // await putCode(page, sync.type, sync.title, sync.code);
+        await putCode(page, sync.type, sync.title, sync.code);
       })
     );
   }
 
-  return responseFormat.okResponse(result);
+  return responseFormat.okResponse(`sync: ${syncList.join(", ")}`);
 };
 
 module.exports.sync = async () => {
