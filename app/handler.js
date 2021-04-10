@@ -100,16 +100,16 @@ module.exports.receive = async (event) => {
   for (let commitInfo of body.commits) {
     syncList = syncList.concat(commitInfo.added.concat(commitInfo.modified));
   }
-  // console.info(syncList);
+  console.info("syncList1", syncList);
   const cssCodeReg = /code\/css\/(.+)\/(.+)\.css/;
   const jsCodeReg = /code\/js\/(.+)\/(.+)\.js/;
   syncList = syncList.filter((path) => {
     cssCodeReg.test(path) || jsCodeReg.test(path);
   });
-  // console.info(syncList);
+  console.info("syncList2", syncList);
   syncList = Array.from(new Set(syncList));
 
-  console.info(syncList);
+  console.info("syncList3", syncList);
 
   return responseFormat.okResponse(result);
 };
