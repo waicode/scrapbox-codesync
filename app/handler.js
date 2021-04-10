@@ -104,6 +104,9 @@ module.exports.receive = async (event) => {
   const cssCodeReg = /code\/css\/(.+)\/(.+)\.css/;
   const jsCodeReg = /code\/js\/(.+)\/(.+)\.js/;
   syncList = syncList.filter((path) => {
+    console.info("path", path);
+    console.info("cssCodeReg.test(path)", cssCodeReg.test(path));
+    console.info("jsCodeReg.test(path)", jsCodeReg.test(path));
     cssCodeReg.test(path) || jsCodeReg.test(path);
   });
   console.info("syncList2", syncList);
