@@ -40,12 +40,11 @@ const getSidCookieJson = () => {
 
 const isSlsLocal = () => {
   if (process.env.IS_LOCAL) {
+    // invoke-local: IS_LOCAL=true
+    // https://www.serverless.com/framework/docs/providers/aws/cli-reference/invoke-local/
     console.info("Running locally");
   }
-  if (process.env.SLS_STAGE == "local") {
-    console.info("Stage is local");
-  }
-  return process.env.IS_LOCAL || process.env.SLS_STAGE == "local";
+  return process.env.IS_LOCAL;
 };
 
 const isSignatureValid = (body, headers) => {
