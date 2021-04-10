@@ -72,6 +72,40 @@ const launchBrowser = async () => {
   });
 };
 
+const putCode = async (page, type, title, code) => {
+  const editMenuSelector = "#page-edit-menu";
+  const deleteBtnSelector =
+    '#app-container div.dropdown.open ul > li > a[title="Delete"]';
+
+  // Delete Page
+  let pageUrl =
+    `https://scrapbox.io/${process.env.PROJECT_NAME}/` +
+    encodeURIComponent(title);
+  await pageAction.deletePage(
+    page,
+    pageUrl,
+    editMenuSelector,
+    deleteBtnSelector
+  );
+
+  // Add Page
+  if (type === "css") {
+    const cssTagName = "#UserCSS";
+    const cssPageEyeCatch = `[${process.env.USER_CSS_EYECATCH_URL}]`;
+    const cssPageData = `\n${cssTagName}\n\n${cssPageEyeCatch}\n\ncode:style.css\n${code}\n\n`;
+    pageUrl = `${pageUrl}?body=` + encodeURIComponent(cssPageData);
+    return await pageAction.addPage(page, pageUrl, editMenuSelector);
+  } else if (type === "js") {
+    const scriptTagName = "#UserScript";
+    const scriptPageEyeCatch = `[${process.env.USER_SCRIPT_EYECATCH_URL}]`;
+    const scriptPageData = `\n${scriptTagName}\n\n${scriptPageEyeCatch}\n\ncode:script.js\n${userScriptPageDic.code}\n\n`;
+    pageUrl = `${pageUrl}?body=` + encodeURIComponent(scriptPageData);
+    return await pageAction.addPage(page, pageUrl, editMenuSelector);
+  } else {
+    // TODO: Error
+  }
+};
+
 module.exports.receive = async (event) => {
   if (isSlsLocal()) {
     console.error("no event on local");
@@ -96,23 +130,42 @@ module.exports.receive = async (event) => {
 
   console.info(body.commits);
 
-  let syncList = [];
+  let pathList = [];
   for (let commitInfo of body.commits) {
-    syncList = syncList.concat(commitInfo.added.concat(commitInfo.modified));
+    pathList = pathList.concat(commitInfo.added.concat(commitInfo.modified));
   }
-  console.info("syncList1", syncList);
-  const cssCodeReg = /code\/css\/(.+)\/(.+)\.css/;
-  const jsCodeReg = /code\/js\/(.+)\/(.+)\.js/;
-  syncList = syncList.filter((path) => {
-    console.info("path", path);
-    console.info("cssCodeReg.test(path)", cssCodeReg.test(path));
-    console.info("jsCodeReg.test(path)", jsCodeReg.test(path));
-    return cssCodeReg.test(path) || jsCodeReg.test(path);
-  });
-  console.info("syncList2", syncList);
-  syncList = Array.from(new Set(syncList));
 
-  console.info("syncList3", syncList);
+  const cssCodeReg = /code\/css\/(.+)\/.+\.css/;
+  const jsCodeReg = /code\/js\/(.+)\/.+\.js/;
+  let syncList = Array.from(
+    new Set(
+      pathList.filter((path) => cssCodeReg.test(path) || jsCodeReg.test(path))
+    )
+  ).map(async (path) => {
+    let fileData = await fs.readFileSync(`../${path}`, "utf-8");
+    if (cssCodeReg.test(path)) {
+      return {
+        type: "css",
+        title: path.match(cssCodeReg)[1],
+        code: addTabHeadOfLine(fileData),
+      };
+    } else if (jsCodeReg.test(path)) {
+      return {
+        type: "js",
+        title: path.match(jsCodeReg)[1],
+        code: addTabHeadOfLine(fileData),
+      };
+    }
+  });
+
+  if (syncList.length > 0) {
+    browser = await launchBrowser();
+    let page = await browser.newPage();
+    for (sync of syncList) {
+      console.log("sync", sync);
+      // await putCode(page, sync.type, sync.title, sync.code);
+    }
+  }
 
   return responseFormat.okResponse(result);
 };
@@ -139,7 +192,7 @@ module.exports.sync = async () => {
       cssFilesList.map(async (path) => {
         let cssFileData = await fs.readFileSync(path, "utf-8");
         return {
-          title: path.match(/code\/css\/(.+)\/(.+)\.css/)[1],
+          title: path.match(/code\/css\/(.+)\/.+\.css/)[1],
           code: addTabHeadOfLine(cssFileData),
         };
       })
@@ -151,7 +204,7 @@ module.exports.sync = async () => {
       jsFilesList.map(async (path) => {
         let jsFileData = await fs.readFileSync(path, "utf-8");
         return {
-          title: path.match(/code\/js\/(.+)\/(.+)\.js/)[1],
+          title: path.match(/code\/js\/(.+)\/.+\.js/)[1],
           code: addTabHeadOfLine(jsFileData),
         };
       })
