@@ -42,7 +42,7 @@ const isSlsLocal = () => {
   if (process.env.IS_LOCAL) {
     // invoke-local: IS_LOCAL=true
     // https://www.serverless.com/framework/docs/providers/aws/cli-reference/invoke-local/
-    console.info("Running locally");
+    console.info("Running on local");
   }
   return process.env.IS_LOCAL;
 };
@@ -144,7 +144,7 @@ async function addPage(page, targetUrl, editMenuSelector) {
 }
 
 module.exports.receive = async (event) => {
-  if (isSlsLocal) {
+  if (isSlsLocal()) {
     console.error("no event on local");
     return fatalResponse();
   }
