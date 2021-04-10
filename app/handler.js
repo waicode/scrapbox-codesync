@@ -171,7 +171,9 @@ module.exports.receive = async (event) => {
     );
   }
 
-  return responseFormat.okResponse(`sync: ${syncList.join(", ")}`);
+  return responseFormat.okResponse(
+    `sync: ${syncList.map((sync) => sync.type + ":" + sync.title).join(", ")}`
+  );
 };
 
 module.exports.sync = async () => {
