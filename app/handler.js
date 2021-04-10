@@ -159,7 +159,7 @@ module.exports.receive = async (event) => {
   });
 
   if (syncList.length > 0) {
-    browser = await launchBrowser();
+    let browser = await launchBrowser();
     let page = await browser.newPage();
     for (sync of syncList) {
       console.log("sync", sync);
