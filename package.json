@@ -11,6 +11,7 @@
     "chrome-aws-lambda": "^8.0.0",
     "puppeteer-core": "^8.0.0",
     "request": "^2.88.2",
+    "serverless-dotenv-plugin": "^3.9.0",
     "serverless-jest-plugin": "^0.3.0"
   },
   "devDependencies": {

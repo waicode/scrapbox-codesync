@@ -5,7 +5,6 @@ frameworkVersion: "2"
 plugins:
   - serverless-jest-plugin
   - serverless-dotenv-plugin
-  - serverless-cloudformation-changesets
 
 useDotenv: true
 

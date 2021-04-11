@@ -94,13 +94,13 @@ const putCode = async (page, type, title, code) => {
 
   // Add page
   if (type === constantValue.TYPE_CSS) {
-    const cssTagName = "#UserCSS";
+    const cssTagName = process.env.USER_CSS_TAG;
     const cssPageEyeCatch = `[${process.env.USER_CSS_EYECATCH_URL}]`;
     const cssPageData = `\n${cssTagName}\n\n${cssPageEyeCatch}\n\ncode:style.css\n${code}\n\n`;
     pageUrl = `${pageUrl}?body=` + encodeURIComponent(cssPageData);
     await pageAction.addPage(page, pageUrl, editMenuSelector);
   } else if (type === constantValue.TYPE_JS) {
-    const scriptTagName = "#UserScript";
+    const scriptTagName = process.env.USER_SCRIPT_TAG;
     const scriptPageEyeCatch = `[${process.env.USER_SCRIPT_EYECATCH_URL}]`;
     const scriptPageData = `\n${scriptTagName}\n\n${scriptPageEyeCatch}\n\ncode:script.js\n${code}\n\n`;
     pageUrl = `${pageUrl}?body=` + encodeURIComponent(scriptPageData);
