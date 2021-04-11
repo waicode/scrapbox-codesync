@@ -132,9 +132,9 @@ module.exports.receive = async (event) => {
     })
   );
 
+  let msg = "";
   if (codePageDicList.length > 0) {
     let browser = null;
-    let msg = "";
     try {
       browser = await pageAction.launchBrowser(isSlsLocal());
       let page = await pageAction.preparePage(browser);
