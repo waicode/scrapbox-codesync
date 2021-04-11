@@ -65,6 +65,7 @@ package:
     - node_modules/serverless/**
     - node_modules/chrome-aws-lambda/**
     - chrome-aws-lambda/**
+    - tests/**
 
 layers:
   chrome:
