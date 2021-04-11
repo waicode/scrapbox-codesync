@@ -42,6 +42,32 @@ const isSignatureValid = (body, headers) => {
   return digest.length == sigHeader.length && digest == sigHeader;
 };
 
+// Slice array by number
+const sliceByNumber = (array, number) => {
+  const length = Math.ceil(array.length / number);
+  return new Array(length)
+    .fill()
+    .map((_, i) => array.slice(i * number, (i + 1) * number));
+};
+
+// Put code list concurrently
+const putCodeList = async (browser, codePageDicList) => {
+  const codePageDicLists = sliceByNumber(
+    codePageDicList,
+    process.env.CONCURRENT_EXEC_NUMBER
+  );
+  for (codePageDicList of codePageDicLists) {
+    await Promise.all(
+      codePageDicList.map(async (dic) => {
+        let codePage = await pageAction.preparePage(browser);
+        console.info("putCode start -", dic.type, dic.title);
+        await putCode(codePage, dic.type, dic.title, dic.code);
+        console.info("putCode complete -", dic.type, dic.title);
+      })
+    );
+  }
+};
+
 // Put CSS/JS code page (delete => add)
 const putCode = async (page, type, title, code) => {
   const editMenuSelector = "#page-edit-menu";
@@ -82,6 +108,7 @@ const putCode = async (page, type, title, code) => {
 };
 
 /**
+ * Handler: receive
  * Receiving GitHub event, sync added/modified pages  => Scrapbox
  */
 module.exports.receive = async (event) => {
@@ -147,14 +174,8 @@ module.exports.receive = async (event) => {
     try {
       browser = await pageAction.launchBrowser(isSlsLocal());
 
-      await Promise.all(
-        codePageDicList.map(async (dic) => {
-          let codePage = await pageAction.preparePage(browser);
-          console.info("putCode start - ", dic.type, dic.title);
-          await putCode(codePage, dic.type, dic.title, dic.code);
-          console.info("putCode complete - ", dic.type, dic.title);
-        })
-      );
+      await putCodeList(browser, codePageDicList);
+
       msg = `sync complete - ${codePageDicList
         .map((dic) => dic.type + ":" + dic.title)
         .join(", ")}`;
@@ -206,6 +227,7 @@ const getUserScriptPageDicList = async () => {
 };
 
 /**
+ * Handler: allSync
  * Sync all CSS/JS pages  => Scrapbox
  */
 module.exports.allSync = async () => {
@@ -218,14 +240,9 @@ module.exports.allSync = async () => {
 
     browser = await pageAction.launchBrowser(isSlsLocal());
 
-    await Promise.all(
-      userCssPageDicList.concat(userScriptPageDicList).map(async (dic) => {
-        let codePage = await pageAction.preparePage(browser);
-        console.info("putCode start - ", dic.type, dic.title);
-        await putCode(codePage, dic.type, dic.title, dic.code);
-        console.info("putCode complete - ", dic.type, dic.title);
-      })
-    );
+    const codePageDicList = userCssPageDicList.concat(userScriptPageDicList);
+
+    await putCodeList(browser, codePageDicList);
 
     msg = `sync complete - ${userCssPageDicList
       .concat(userScriptPageDicList)
