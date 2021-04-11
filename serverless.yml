@@ -15,7 +15,7 @@ custom:
   environment:
     SLS_STAGE: ${self:provider.stage}
     PROJECT_NAME: ${opt:projectName, env:PROJECT_NAME}
-    GITHUB_WEBHOOK_SECRET_TOKEN: ${opt:secretToken, env:GITHUB_WEBHOOK_SECRET_TOKEN}
+    GITHUB_WEBHOOK_SECRET_TOKEN: ${opt:githubSecretToken, env:GITHUB_WEBHOOK_SECRET_TOKEN}
     SCRAPBOX_CONNECT_SID: ${opt:scrapboxConnectSid, env:SCRAPBOX_CONNECT_SID}
     USER_CSS_EYECATCH_URL: ${env:USER_CSS_EYECATCH_URL}
     USER_SCRIPT_EYECATCH_URL: ${env:USER_SCRIPT_EYECATCH_URL}
