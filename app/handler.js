@@ -20,6 +20,7 @@ const listFiles = (dir) =>
 const addTabHeadOfLine = (fileData) =>
   fileData.replace(/^/g, "\t").replace(/\n/g, "\n\t").replace(/\t$/g, "");
 
+// Check invoke-local
 const isSlsLocal = () => {
   if (process.env.IS_LOCAL) {
     // invoke-local -> IS_LOCAL=true
@@ -29,6 +30,7 @@ const isSlsLocal = () => {
   return process.env.IS_LOCAL;
 };
 
+// Valid Github Signature
 const isSignatureValid = (body, headers) => {
   const sigHashAlg = "sha256";
   const sigHeaderName = "X-Hub-Signature-256";
@@ -40,12 +42,13 @@ const isSignatureValid = (body, headers) => {
   return digest.length == sigHeader.length && digest == sigHeader;
 };
 
+// Put CSS/JS code page (delete => add)
 const putCode = async (page, type, title, code) => {
   const editMenuSelector = "#page-edit-menu";
   const deleteBtnSelector =
     '#app-container div.dropdown.open ul > li > a[title="Delete"]';
 
-  // Delete Page
+  // Delete page
   let pageUrl =
     `https://scrapbox.io/${process.env.PROJECT_NAME}/` +
     encodeURIComponent(title);
@@ -57,7 +60,7 @@ const putCode = async (page, type, title, code) => {
     deleteBtnSelector
   );
 
-  // Add Page
+  // Add page
   if (type === constantValue.TYPE_CSS) {
     const cssTagName = "#UserCSS";
     const cssPageEyeCatch = `[${process.env.USER_CSS_EYECATCH_URL}]`;
@@ -75,22 +78,25 @@ const putCode = async (page, type, title, code) => {
   }
 };
 
+/**
+ * Receiving GitHub event, sync added/modified pages  => Scrapbox
+ */
 module.exports.receive = async (event) => {
-  // check stage
+  // Check invoke-local
   if (isSlsLocal()) {
     const msg = "no event on local";
     console.error(msg);
     return responseFormat.fatalResponse(msg);
   }
 
-  // check signature
+  // Check signature
   if (!isSignatureValid(event.body, event.headers)) {
     const msg = "unauthorized signature";
     console.info(msg);
     return responseFormat.unauthorizedResponse(msg);
   }
 
-  // check gitHub event type
+  // Check gitHub event type
   const gitHubEventList = event.headers["X-GitHub-Event"];
   if (!gitHubEventList.includes("push")) {
     const msg = "only push event";
@@ -162,6 +168,7 @@ module.exports.receive = async (event) => {
   return responseFormat.okResponse(msg);
 };
 
+// Get all css pages list
 const getUserCssPageDicList = async () => {
   const cssFilesList = listFiles("code/css");
   const userCssPageDicList = await Promise.all(
@@ -177,6 +184,7 @@ const getUserCssPageDicList = async () => {
   return userCssPageDicList;
 };
 
+// Get all script pages list
 const getUserScriptPageDicList = async () => {
   const jsFilesList = listFiles("code/js");
   const userScriptPageDicList = await Promise.all(
@@ -192,6 +200,9 @@ const getUserScriptPageDicList = async () => {
   return userScriptPageDicList;
 };
 
+/**
+ * Sync all CSS/JS pages  => Scrapbox
+ */
 module.exports.allSync = async () => {
   let browser = null;
   let msg = "";
