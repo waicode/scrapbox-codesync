@@ -1,5 +1,23 @@
 const chromium = require("chrome-aws-lambda");
 
+const getSidCookieJson = () => {
+  return [
+    {
+      domain: "scrapbox.io",
+      hostOnly: true,
+      httpOnly: true,
+      name: "connect.sid",
+      path: "/",
+      sameSite: "unspecified",
+      secure: true,
+      session: false,
+      storeId: "0",
+      value: process.env.SCRAPBOX_CONNECT_SID,
+      id: 1,
+    },
+  ];
+};
+
 exports.launchBrowser = async (isLocal = false) => {
   return await chromium.puppeteer.launch({
     args: chromium.args,
@@ -22,24 +40,6 @@ exports.preparePage = async (browser) => {
   // set connect.sid cookie for scrapbox.io
   await page.setCookie(...getSidCookieJson());
   return page;
-};
-
-exports.getSidCookieJson = () => {
-  return [
-    {
-      domain: "scrapbox.io",
-      hostOnly: true,
-      httpOnly: true,
-      name: "connect.sid",
-      path: "/",
-      sameSite: "unspecified",
-      secure: true,
-      session: false,
-      storeId: "0",
-      value: process.env.SCRAPBOX_CONNECT_SID,
-      id: 1,
-    },
-  ];
 };
 
 exports.deletePage = async (
