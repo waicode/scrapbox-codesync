@@ -10,7 +10,7 @@ useDotenv: true
 
 custom:
   defaultRegion: ap-northeast-1
-  defaultStage: st
+  defaultStage: prod
   profile: slsfw-${self:provider.stage} # Specify the profile according to the stage
   environment:
     SLS_STAGE: ${self:provider.stage}
