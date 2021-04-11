@@ -37,7 +37,7 @@ exports.preparePage = async (browser) => {
     await dialog.accept();
   });
 
-  // set connect.sid cookie for scrapbox.io
+  // Set connect.sid cookie for scrapbox.io
   await page.setCookie(...getSidCookieJson());
   return page;
 };

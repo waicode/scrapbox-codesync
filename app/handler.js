@@ -158,7 +158,8 @@ module.exports.receive = async (event) => {
       return responseFormat.fatalResponse(error.message);
     } finally {
       if (browser !== null) {
-        await browser.close();
+        // TODO: fix
+        // await browser.close();
       }
     }
   } else {
