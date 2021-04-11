@@ -108,7 +108,11 @@ module.exports.receive = async (event) => {
   let codePageDicList = await Promise.all(
     Array.from(
       new Set(
-        pathList.filter((path) => cssCodeReg.test(path) || jsCodeReg.test(path))
+        pathList.filter(
+          (path) =>
+            constantValue.CSS_CODE_REG.test(path) ||
+            constantValue.JS_CODE_REG.test(path)
+        )
       )
     ).map(async (path) => {
       let fileData = await fs.readFileSync(path, "utf-8");
