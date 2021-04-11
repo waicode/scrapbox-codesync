@@ -10,7 +10,8 @@
     "aws-sdk": "^2.868.0",
     "chrome-aws-lambda": "^8.0.0",
     "puppeteer-core": "^8.0.0",
-    "request": "^2.88.2"
+    "request": "^2.88.2",
+    "serverless-jest-plugin": "^0.3.0"
   },
   "devDependencies": {
     "puppeteer": "^8.0.0"
