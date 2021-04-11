@@ -36,7 +36,10 @@ const isSignatureValid = (body, headers) => {
   const sigHeaderName = "X-Hub-Signature-256";
   const sigHeader = headers[sigHeaderName];
   const crypto = require("crypto");
-  const hmac = crypto.createHmac(sigHashAlg, process.env.SECRET_TOKEN);
+  const hmac = crypto.createHmac(
+    sigHashAlg,
+    process.env.GITHUB_WEBHOOK_SECRET_TOKEN
+  );
   hmac.update(body, "utf8");
   const digest = `${sigHashAlg}=` + hmac.digest("hex");
   return digest.length == sigHeader.length && digest == sigHeader;
