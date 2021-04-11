@@ -20,8 +20,6 @@ custom:
     SCRAPBOX_CONNECT_SID: ${opt:scrapboxConnectSid, env:SCRAPBOX_CONNECT_SID}
     USER_CSS_EYECATCH_URL: ${env:USER_CSS_EYECATCH_URL}
     USER_SCRIPT_EYECATCH_URL: ${env:USER_SCRIPT_EYECATCH_URL}
-  jest:
-    testTimeout: 30000
 
   request:
     template:
