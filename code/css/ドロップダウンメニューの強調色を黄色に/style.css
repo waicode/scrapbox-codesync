@@ -1,0 +1,9 @@
+.dropdown-menu > li > a.selected,
+[data-hover-visible] .dropdown-menu > li > a.selected {
+  color: #f70e01;
+}
+.global-menu li a.updated,
+.global-menu li a.highlight {
+  border-left: 2px solid #ffa000;
+  padding-left: 18px;
+}

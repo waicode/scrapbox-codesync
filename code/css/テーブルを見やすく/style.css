@@ -1,0 +1,19 @@
+.table-block .cell {
+  /* 全てのセルの右と下 */
+  border-right: solid 1px #cccccc;
+  border-bottom: solid 1px #cccccc;
+}
+.table-block .cell:first-child {
+  /* 1列目のセルの左 */
+  border-left: solid 1px #cccccc;
+}
+.section-title + .line .table-block .cell {
+  /* 1行目のセルの上 */
+  border-top: solid 1px #cccccc;
+}
+
+/* 1行目を太字、中央揃え */
+.section-title + .line .table-block .cell {
+  font-weight: bolder;
+  text-align: center;
+}

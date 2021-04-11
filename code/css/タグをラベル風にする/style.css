@@ -1,0 +1,18 @@
+a[type="hashTag"] {
+  display: inline-block;
+  padding: 0px 8px;
+  margin: 0 6px 0 0;
+  background: #f9f9f9;
+  color: #888;
+  font-size: 0.6em;
+  border: 1px solid #888;
+  border-radius: 3px;
+  /* transition: .3s; */
+  -webkit-transform: scale(1);
+  transform: scale(1);
+}
+a[type="hashTag"]:hover {
+  color: #ffffff;
+  background: #888;
+  border: 1px solid #888;
+}

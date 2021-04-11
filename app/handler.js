@@ -45,6 +45,8 @@ const isSignatureValid = (body, headers) => {
 // Put CSS/JS code page (delete => add)
 const putCode = async (page, type, title, code) => {
   const editMenuSelector = "#page-edit-menu";
+  const copyLinkSelector =
+    "#app-container div.dropdown.open ul > li:nth-child(1) > a";
   const deleteBtnSelector =
     '#app-container div.dropdown.open ul > li > a[title="Delete"]';
 
@@ -57,6 +59,7 @@ const putCode = async (page, type, title, code) => {
     page,
     pageUrl,
     editMenuSelector,
+    copyLinkSelector,
     deleteBtnSelector
   );
 
@@ -70,7 +73,7 @@ const putCode = async (page, type, title, code) => {
   } else if (type === constantValue.TYPE_JS) {
     const scriptTagName = "#UserScript";
     const scriptPageEyeCatch = `[${process.env.USER_SCRIPT_EYECATCH_URL}]`;
-    const scriptPageData = `\n${scriptTagName}\n\n${scriptPageEyeCatch}\n\ncode:script.js\n${userScriptPageDic.code}\n\n`;
+    const scriptPageData = `\n${scriptTagName}\n\n${scriptPageEyeCatch}\n\ncode:script.js\n${code}\n\n`;
     pageUrl = `${pageUrl}?body=` + encodeURIComponent(scriptPageData);
     await pageAction.addPage(page, pageUrl, editMenuSelector);
   } else {
@@ -143,11 +146,13 @@ module.exports.receive = async (event) => {
     let browser = null;
     try {
       browser = await pageAction.launchBrowser(isSlsLocal());
-      let page = await pageAction.preparePage(browser);
 
-      Promise.all(
-        codePageDicList.map(async (sync) => {
-          await putCode(page, sync.type, sync.title, sync.code);
+      await Promise.all(
+        codePageDicList.map(async (dic) => {
+          let codePage = await pageAction.preparePage(browser);
+          console.info("putCode start - ", dic.type, dic.title);
+          await putCode(codePage, dic.type, dic.title, dic.code);
+          console.info("putCode complete - ", dic.type, dic.title);
         })
       );
       msg = `sync complete - ${codePageDicList
@@ -158,8 +163,7 @@ module.exports.receive = async (event) => {
       return responseFormat.fatalResponse(error.message);
     } finally {
       if (browser !== null) {
-        // TODO: fix
-        // await browser.close();
+        await browser.close();
       }
     }
   } else {
@@ -209,25 +213,25 @@ module.exports.allSync = async () => {
   let msg = "";
 
   try {
-    const userCssPageDicList = getUserCssPageDicList();
-    const userScriptPageDicList = getUserScriptPageDicList();
+    const userCssPageDicList = await getUserCssPageDicList();
+    const userScriptPageDicList = await getUserScriptPageDicList();
 
     browser = await pageAction.launchBrowser(isSlsLocal());
-    let page = await pageAction.preparePage(browser);
 
-    Promise.all([
-      userCssPageDicList.map(async (dic) => {
-        await putCode(page, dic.type, dic.title, dic.code);
-      }),
-      userScriptPageDicList.map(async (dic) => {
-        await putCode(page, dic.type, dic.title, dic.code);
-      }),
-    ]);
+    await Promise.all(
+      userCssPageDicList.concat(userScriptPageDicList).map(async (dic) => {
+        let codePage = await pageAction.preparePage(browser);
+        console.info("putCode start - ", dic.type, dic.title);
+        await putCode(codePage, dic.type, dic.title, dic.code);
+        console.info("putCode complete - ", dic.type, dic.title);
+      })
+    );
 
     msg = `sync complete - ${userCssPageDicList
       .concat(userScriptPageDicList)
       .map((sync) => sync.type + ":" + sync.title)
       .join(", ")}`;
+    return responseFormat.okResponse(msg);
   } catch (error) {
     console.error(error);
     return responseFormat.fatalResponse(error.message);
@@ -236,5 +240,4 @@ module.exports.allSync = async () => {
       await browser.close();
     }
   }
-  return responseFormat.okResponse(msg);
 };

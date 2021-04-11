@@ -18,12 +18,12 @@ const getSidCookieJson = () => {
   ];
 };
 
-exports.launchBrowser = async (isLocal = false) => {
+exports.launchBrowser = async (isLocal = false, headlessMode = true) => {
   return await chromium.puppeteer.launch({
     args: chromium.args,
     defaultViewport: chromium.defaultViewport,
     executablePath: isLocal ? null : await chromium.executablePath, // local puppeteer in node_modules(dev)
-    headless: chromium.headless,
+    headless: headlessMode,
     slowMo: 300,
     ignoreHTTPSErrors: true,
   });
@@ -46,6 +46,7 @@ exports.deletePage = async (
   page,
   targetUrl,
   editMenuSelector,
+  copyLinkSelector,
   deleteBtnSelector
 ) => {
   await Promise.all([
@@ -54,7 +55,7 @@ exports.deletePage = async (
   ]);
 
   await Promise.all([
-    page.waitForSelector(deleteBtnSelector),
+    page.waitForSelector(copyLinkSelector),
     page.click(editMenuSelector),
   ]);
 

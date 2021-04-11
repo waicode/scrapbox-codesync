@@ -1,0 +1,8 @@
+.line span.code-block .code-block-start {
+  background-color: #efefef;
+  padding: 2px 5px 2px 5px !important;
+}
+.line span.code-block .code-block-start a {
+  font-size: 110%;
+  color: #919191;
+}

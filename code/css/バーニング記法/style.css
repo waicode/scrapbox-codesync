@@ -1,0 +1,27 @@
+.deco-\' {
+  color: #fff; /* 白文字 */
+  background: linear-gradient(
+      to right,
+      /* Red A700 */ #d50000,
+      /* Red A200 */ #ff6d00,
+      /* Red A100 */ #ff8a80,
+      /* Pink A200 */ #ff4081,
+      /* Pink A700 */ #c51162,
+      /* Pink A200 */ #ff4081,
+      /* Pink A100 */ #ff80ab,
+      /* Deep Orange A200 */ #ff6e40,
+      /* Deep Orange A700 */ #dd2c00,
+      /* Deep Orange A200 */ #ff6e40,
+      /* Deep Orange A100 */ #ff9e80,
+      /* Red A200 */ #d50000
+    )
+    0% center / 200% auto; /* グラデーション */
+  padding: 0.1em 0.2em 0.1em 0.2em;
+  animation: rainbow 4s linear infinite;
+}
+
+@keyframes rainbow {
+  to {
+    background-position-x: 200%;
+  }
+}
