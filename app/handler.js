@@ -126,7 +126,7 @@ module.exports.receive = async (event) => {
     return responseFormat.unauthorizedResponse(msg);
   }
 
-  // Check gitHub event type
+  // Check Github event type
   const gitHubEventList = event.headers["X-GitHub-Event"];
   if (!gitHubEventList.includes("push")) {
     const msg = "only push event";
@@ -135,6 +135,13 @@ module.exports.receive = async (event) => {
   }
 
   const body = JSON.parse(event.body);
+
+  // Check Github event ref
+  if (!constantValue.TARGET_REF_REG.test(body.ref)) {
+    const msg = "only main or master refs";
+    console.info(msg);
+    return responseFormat.badRequestResponse(msg);
+  }
 
   let pathList = [];
   for (let commitInfo of body.commits) {
