@@ -36,7 +36,10 @@ const isSignatureValid = (body, headers) => {
   const sigHeaderName = "X-Hub-Signature-256";
   const sigHeader = headers[sigHeaderName];
   const crypto = require("crypto");
-  const hmac = crypto.createHmac(sigHashAlg, process.env.SECRET_TOKEN);
+  const hmac = crypto.createHmac(
+    sigHashAlg,
+    process.env.GITHUB_WEBHOOK_SECRET_TOKEN
+  );
   hmac.update(body, "utf8");
   const digest = `${sigHashAlg}=` + hmac.digest("hex");
   return digest.length == sigHeader.length && digest == sigHeader;
@@ -91,13 +94,13 @@ const putCode = async (page, type, title, code) => {
 
   // Add page
   if (type === constantValue.TYPE_CSS) {
-    const cssTagName = "#UserCSS";
+    const cssTagName = process.env.USER_CSS_TAG;
     const cssPageEyeCatch = `[${process.env.USER_CSS_EYECATCH_URL}]`;
     const cssPageData = `\n${cssTagName}\n\n${cssPageEyeCatch}\n\ncode:style.css\n${code}\n\n`;
     pageUrl = `${pageUrl}?body=` + encodeURIComponent(cssPageData);
     await pageAction.addPage(page, pageUrl, editMenuSelector);
   } else if (type === constantValue.TYPE_JS) {
-    const scriptTagName = "#UserScript";
+    const scriptTagName = process.env.USER_SCRIPT_TAG;
     const scriptPageEyeCatch = `[${process.env.USER_SCRIPT_EYECATCH_URL}]`;
     const scriptPageData = `\n${scriptTagName}\n\n${scriptPageEyeCatch}\n\ncode:script.js\n${code}\n\n`;
     pageUrl = `${pageUrl}?body=` + encodeURIComponent(scriptPageData);
@@ -126,7 +129,7 @@ module.exports.receive = async (event) => {
     return responseFormat.unauthorizedResponse(msg);
   }
 
-  // Check gitHub event type
+  // Check Github event type
   const gitHubEventList = event.headers["X-GitHub-Event"];
   if (!gitHubEventList.includes("push")) {
     const msg = "only push event";
@@ -135,6 +138,13 @@ module.exports.receive = async (event) => {
   }
 
   const body = JSON.parse(event.body);
+
+  // Check Github event ref
+  if (!constantValue.TARGET_REF_REG.test(body.ref)) {
+    const msg = "only main or master refs";
+    console.info(msg);
+    return responseFormat.badRequestResponse(msg);
+  }
 
   let pathList = [];
   for (let commitInfo of body.commits) {
