@@ -22,7 +22,7 @@
 
     /* 行番号のフォント・色の指定 */
     font-family: monospace;
-    color: grey;
+    color: rgb(196, 196, 196);
   }
 
   /* カーソル行の行番号を濃く表示する */
