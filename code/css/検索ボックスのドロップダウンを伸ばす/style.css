@@ -1,5 +1,5 @@
 .navbar-form .dropdown.open .dropdown-menu {
   min-width: 100%;
-  max-height: calc(100vh - 130px) !important;
+  max-height: calc(100vh - 120px) !important;
   overflow-y: auto;
 }
