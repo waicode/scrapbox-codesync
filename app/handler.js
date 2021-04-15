@@ -74,7 +74,10 @@ const gotGithubRepoFile = async (path) => {
   };
 
   const response = await axios(config);
-  const decodedContent = Buffer.from(body.content, "base64").toString();
+  const decodedContent = Buffer.from(
+    response.data.content,
+    "base64"
+  ).toString();
   return decodedContent;
 };
 
