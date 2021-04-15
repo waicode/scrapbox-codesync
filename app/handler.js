@@ -5,7 +5,14 @@ const pageAction = require("./sub/pageAction");
 const responseFormat = require("./sub/responseFormat");
 
 const fs = require("fs");
-const got = require("got");
+const axiosBase = require("axios");
+const axios = axiosBase.create({
+  baseURL: "https://api.github.com",
+  headers: {
+    accept: "application/vnd.github.v3+json",
+    authorization: `token ${process.env.GITHUB_API_TOKEN}`,
+  },
+});
 
 // Get the list of file paths under the folder
 const listFiles = (dir) =>
@@ -56,22 +63,15 @@ const sliceByNumber = (array, number) => {
 
 // Got Github file
 const gotGithubRepoFile = async (path) => {
-  const { body } = await got(
-    "https://api.github.com/repos/" +
+  const response = await axios.get(
+    "/" +
       process.env.GITHUB_REPO_OWNER +
       "/" +
       process.env.GITHUB_REPO_NAME +
       "/" +
-      encodeURIComponent(path),
-    {
-      json: true,
-      headers: {
-        accept: "application/vnd.github.v3+json",
-        authorization: `token ${process.env.GITHUB_API_TOKEN}`,
-      },
-    }
-  ).json();
-  return Buffer.from(body.content, "base64").toString();
+      encodeURIComponent(path)
+  );
+  return response.data;
 };
 
 // Put code list concurrently
