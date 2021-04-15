@@ -62,7 +62,7 @@ const gotGithubRepoFile = async (path) => {
       "/" +
       process.env.GITHUB_REPO_NAME +
       "/" +
-      path,
+      encodeURIComponent(path),
     {
       json: true,
       headers: {
@@ -70,7 +70,7 @@ const gotGithubRepoFile = async (path) => {
         authorization: `token ${process.env.GITHUB_API_TOKEN}`,
       },
     }
-  );
+  ).json();
   return Buffer.from(body.content, "base64").toString();
 };
 
