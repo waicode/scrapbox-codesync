@@ -25,7 +25,7 @@ custom:
     GITHUB_REPO_OWNER: ${opt:githubRepoOwner, env:GITHUB_REPO_OWNER}
     GITHUB_REPO_NAME: ${opt:githubRepoName, env:GITHUB_REPO_NAME}
     GITHUB_API_TOKEN: ${opt:githubApiToken, env:GITHUB_API_TOKEN}
-    GITHUB_WEBHOOK_SECRET_TOKEN: ${opt:githubSecretToken, env:GITHUB_WEBHOOK_SECRET_TOKEN}
+    GITHUB_WEBHOOK_SECRET_TOKEN: ${opt:githubWebhookSecretToken, env:GITHUB_WEBHOOK_SECRET_TOKEN}
 
   request:
     template:

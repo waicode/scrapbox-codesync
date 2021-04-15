@@ -24,7 +24,7 @@ exports.launchBrowser = async (isLocal = false, headlessMode = true) => {
     defaultViewport: chromium.defaultViewport,
     executablePath: isLocal ? null : await chromium.executablePath, // local puppeteer in node_modules(dev)
     headless: headlessMode,
-    slowMo: 300,
+    slowMo: 500,
     ignoreHTTPSErrors: true,
   });
 };
