@@ -74,6 +74,8 @@ const gotGithubRepoFile = async (path) => {
   };
 
   const response = await axios(config);
+  console.info("response.data", response.data);
+
   return response.data;
 };
 
