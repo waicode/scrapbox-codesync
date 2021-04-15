@@ -14,15 +14,18 @@ custom:
   profile: slsfw-${self:provider.stage} # Specify the profile according to the stage
   environment:
     SLS_STAGE: ${self:provider.stage}
-    PROJECT_NAME: ${opt:projectName, env:PROJECT_NAME}
-    GITHUB_WEBHOOK_SECRET_TOKEN: ${opt:githubSecretToken, env:GITHUB_WEBHOOK_SECRET_TOKEN}
-    SCRAPBOX_CONNECT_SID: ${opt:scrapboxConnectSid, env:SCRAPBOX_CONNECT_SID}
     USER_CSS_EYECATCH_URL: ${env:USER_CSS_EYECATCH_URL}
     USER_SCRIPT_EYECATCH_URL: ${env:USER_SCRIPT_EYECATCH_URL}
     USER_CSS_TAG: ${env:USER_CSS_TAG}
     USER_SCRIPT_TAG: ${env:USER_SCRIPT_TAG}
     CONCURRENT_EXEC_NUMBER: ${env:CONCURRENT_EXEC_NUMBER}
+    SCRAPBOX_PROJECT_NAME: ${opt:scrapboxProjectName, env:SCRAPBOX_PROJECT_NAME}
+    SCRAPBOX_CONNECT_SID: ${opt:scrapboxConnectSid, env:SCRAPBOX_CONNECT_SID}
     GITHUB_TARGET_BRUNCH: ${env:GITHUB_TARGET_BRUNCH}
+    GITHUB_REPO_OWNER: ${opt:githubRepoOwner, env:GITHUB_REPO_OWNER}
+    GITHUB_REPO_NAME: ${opt:githubRepoName, env:GITHUB_REPO_NAME}
+    GITHUB_API_TOKEN: ${opt:githubApiToken, env:GITHUB_API_TOKEN}
+    GITHUB_WEBHOOK_SECRET_TOKEN: ${opt:githubSecretToken, env:GITHUB_WEBHOOK_SECRET_TOKEN}
 
   request:
     template:
