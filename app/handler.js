@@ -69,7 +69,7 @@ const gotGithubRepoFile = async (path) => {
       "/" +
       process.env.GITHUB_REPO_NAME +
       "/" +
-      encodeURIComponent(path)
+      path
   );
   return response.data;
 };
