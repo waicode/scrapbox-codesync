@@ -74,9 +74,8 @@ const gotGithubRepoFile = async (path) => {
   };
 
   const response = await axios(config);
-  console.info("response.data", response.data);
-
-  return response.data;
+  const decodedContent = Buffer.from(body.content, "base64").toString();
+  return decodedContent;
 };
 
 // Put code list concurrently
