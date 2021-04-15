@@ -57,11 +57,11 @@ const sliceByNumber = (array, number) => {
 // Got Github file
 const gotGithubRepoFile = async (path) => {
   const filePath = encodeURI(
-    "contents/" +
+    "repos/" +
       process.env.GITHUB_REPO_OWNER +
       "/" +
       process.env.GITHUB_REPO_NAME +
-      "/" +
+      "/contents/" +
       path
   );
   const config = {
