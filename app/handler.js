@@ -5,6 +5,7 @@ const pageAction = require("./sub/pageAction");
 const responseFormat = require("./sub/responseFormat");
 
 const fs = require("fs");
+const got = require("got");
 
 // Get the list of file paths under the folder
 const listFiles = (dir) =>
@@ -53,6 +54,26 @@ const sliceByNumber = (array, number) => {
     .map((_, i) => array.slice(i * number, (i + 1) * number));
 };
 
+// Got Github file
+const gotGithubRepoFile = async (path) => {
+  const { body } = await got(
+    "https://api.github.com/repos/" +
+      process.env.GITHUB_REPO_OWNER +
+      "/" +
+      process.env.GITHUB_REPO_NAME +
+      "/" +
+      path,
+    {
+      json: true,
+      headers: {
+        accept: "application/vnd.github.v3+json",
+        authorization: `token ${process.env.GITHUB_API_TOKEN}`,
+      },
+    }
+  );
+  return Buffer.from(body.content, "base64").toString();
+};
+
 // Put code list concurrently
 const putCodeList = async (browser, codePageDicList) => {
   const codePageDicLists = sliceByNumber(
@@ -81,7 +102,7 @@ const putCode = async (page, type, title, code) => {
 
   // Delete page
   let pageUrl =
-    `https://scrapbox.io/${process.env.PROJECT_NAME}/` +
+    `https://scrapbox.io/${process.env.SCRAPBOX_PROJECT_NAME}/` +
     encodeURIComponent(title);
 
   await pageAction.deletePage(
@@ -161,7 +182,7 @@ module.exports.receive = async (event) => {
         )
       )
     ).map(async (path) => {
-      let fileData = await fs.readFileSync(path, "utf-8");
+      let fileData = await gotGithubRepoFile(path);
       if (constantValue.CSS_CODE_REG.test(path)) {
         return {
           type: constantValue.TYPE_CSS,
@@ -209,7 +230,7 @@ const getUserCssPageDicList = async () => {
   const cssFilesList = listFiles("code/css");
   const userCssPageDicList = await Promise.all(
     cssFilesList.map(async (path) => {
-      let cssFileData = await fs.readFileSync(path, "utf-8");
+      let cssFileData = await gotGithubRepoFile(path);
       return {
         type: constantValue.TYPE_CSS,
         title: path.match(constantValue.CSS_CODE_REG)[1],
@@ -225,7 +246,7 @@ const getUserScriptPageDicList = async () => {
   const jsFilesList = listFiles("code/js");
   const userScriptPageDicList = await Promise.all(
     jsFilesList.map(async (path) => {
-      let jsFileData = await fs.readFileSync(path, "utf-8");
+      let jsFileData = await gotGithubRepoFile(path);
       return {
         type: constantValue.TYPE_JS,
         title: path.match(constantValue.JS_CODE_REG)[1],
