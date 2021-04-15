@@ -57,7 +57,7 @@ const sliceByNumber = (array, number) => {
 // Got Github file
 const gotGithubRepoFile = async (path) => {
   const filePath = encodeURI(
-    "/" +
+    "contents/" +
       process.env.GITHUB_REPO_OWNER +
       "/" +
       process.env.GITHUB_REPO_NAME +
@@ -66,7 +66,7 @@ const gotGithubRepoFile = async (path) => {
   );
   const config = {
     method: "get",
-    url: `https://api.github.com${filePath}`,
+    url: `https://api.github.com/${filePath}`,
     headers: {
       accept: "application/vnd.github.v3+json",
       authorization: `token ${process.env.GITHUB_API_TOKEN}`,
