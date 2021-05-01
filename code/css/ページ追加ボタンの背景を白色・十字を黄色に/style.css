@@ -1,6 +1,9 @@
 .new-button {
   background-color: #ffffff;
 }
+.new-button:hover {
+  background-color: #ffffff !important;
+}
 .new-button .vertical-line {
   background-color: #ffb300;
 }
