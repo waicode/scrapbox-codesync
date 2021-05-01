@@ -12,18 +12,16 @@
   .telomere-border.unread:hover {
   box-sizing: border-box;
   width: auto;
-  border-color: #ffffff;
   background-color: transparent;
 }
 
-/* ↓新着以外のテロメアの色と太さ */
+/* 新着以外のテロメアの色と太さ */
 .line .telomere .telomere-border {
-  background-color: #ffffff;
   width: 2px;
 }
 
-/* ↓新着のテロメアの色と太さ */
+/* 新着のテロメアの色と太さ */
 .line .telomere .telomere-border.unread {
-  background-color: #ffb300;
+  background-color: #dcedc8;
   width: 5px;
 }
