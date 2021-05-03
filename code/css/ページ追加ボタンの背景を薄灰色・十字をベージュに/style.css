@@ -1,0 +1,12 @@
+.new-button {
+  background-color: #fafafa;
+}
+.new-button:hover {
+  background-color: #fafafa !important;
+}
+.new-button .vertical-line {
+  background-color: #d7ccc8;
+}
+.new-button .horizontal-line {
+  background-color: #bcaaa4;
+}
