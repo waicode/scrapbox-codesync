@@ -4,11 +4,18 @@
   max-width: calc(100% - 4em);
   line-height: 1;
   color: #fff !important;
-  background-color: rgba(161, 136, 127, 0.85);
+  background-color: rgba(141, 110, 99, 0.85);
   padding: 3px 4px 2px 5px;
   margin-left: 0.6em;
   border-radius: 0.4em;
   border-bottom-left-radius: 0;
+}
+.line:not(.cursor-line) .deco-\{ .page-link {
+  color: #bbdefb !important;
+  text-decoration: underline;
+}
+.line:not(.cursor-line) .deco-\{ .empty-page-link {
+  color: #ffcdd2 !important;
 }
 .line:not(.cursor-line) .deco-\{::after {
   display: block; /* reduce the damage in FF3.0 */
@@ -19,5 +26,5 @@
   content: "";
   border-width: 0 0 0.5em 0.5em;
   border-style: solid;
-  border-color: rgba(161, 136, 127, 0.85) transparent;
+  border-color: rgba(141, 110, 99, 0.85) transparent;
 }
