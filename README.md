@@ -5,7 +5,7 @@
 <br />
 
 <p align="center">
-    <img src="https://cacoo.com/diagrams/L5gAbKbq1avCXTpq-70E32.png" width="480">
+    <img src="https://cacoo.com/diagrams/L5gAbKbq1avCXTpq-70E32.png" width="640">
 </p>
 
 
