@@ -8,7 +8,6 @@
     <img src="https://cacoo.com/diagrams/L5gAbKbq1avCXTpq-70E32.png" width="640">
 </p>
 
-
 ## 📗 Document
 
 https://scrapbox.io/waicode/scrapbox-codesync
