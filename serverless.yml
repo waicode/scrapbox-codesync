@@ -11,7 +11,7 @@ useDotenv: true
 custom:
   defaultRegion: ap-northeast-1
   defaultStage: prod
-  profile: slsfw-${self:provider.stage} # Specify the profile according to the stage
+  profile: slsfw-${self:provider.stage}
   environment:
     SLS_STAGE: ${self:provider.stage}
     USER_CSS_EYECATCH_URL: ${env:USER_CSS_EYECATCH_URL}
