@@ -4,8 +4,11 @@
   display: none !important;
 }
 .navbar-brand::before {
-  content: "\f0c9";
-  font-family: FontAwesome;
-  font-size: 16px;
-  color: #ffffff;
+  content: "";
+  display: inline-block;
+  background-image: url("https://i.gyazo.com/f44dbeb96afa3c161a513c5a054b781d.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 16px;
+  height: 16px;
 }
