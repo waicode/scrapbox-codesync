@@ -1,0 +1,24 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "allowCompoundWords": true,
+  "words": [
+    "daiiz",
+    "dotenv",
+    "Gyazo",
+    "Mincho",
+    "slsfw",
+    "telomere",
+    "waicode"
+  ],
+  "ignorePaths": [
+    ".vscode",
+    ".devcontainer",
+    ".git",
+    "node_modules",
+    "package.json",
+    "package-lock.json",
+    "layers",
+    ".cspell.json"
+  ]
+}
