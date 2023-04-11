@@ -25,3 +25,6 @@
   background-color: #dcedc8;
   width: 5px !important;
 }
+.line .telomere .telomere-border.unread:not(.updated-after-load) {
+  border-color: #fff!important;
+}
